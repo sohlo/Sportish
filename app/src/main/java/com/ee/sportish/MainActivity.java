@@ -116,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         locationPrevious = locationManager.getLastKnownLocation(provider);
-        initialLocation = locationPrevious;
+
         if (locationPrevious != null) {
-            //do something pls
+            initialLocation = locationPrevious;
         }
 
 
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         textviewTrackLine = (TextView) findViewById(R.id.textview_track_line);
         textviewWpLine = (TextView) findViewById(R.id.textview_wp_line);
         textviewTotalLine = (TextView) findViewById(R.id.textview_total_line);
-        createNotification();
+        mainNotification();
 
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -164,9 +164,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.menu_mylocation:
                 item.setChecked(!item.isChecked());
@@ -305,11 +302,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap.setMyLocationEnabled(false);
     }
 
+    //adds new waypoint on map
     public void buttonAddWayPointClicked(View view) {
         if (locationPrevious == null) {
             return;
         }
-
         markerCount++;
         markerUsed = true;
         wpDistance = 0;
@@ -319,14 +316,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         textViewWPCount.setText(Integer.toString(markerCount));
     }
 
+    //resets overall tracking
     public void buttonCResetClicked(View view) {
         totalDistance = 0;
         sessionTotalLine = 0;
-        
+
         totalLine = 0;
         initialLocation = null;
     }
 
+    //resets track and waypoint tracking
     public void buttonCResetAllClicked(View view) {
         mGoogleMap.clear();
         wpDistance = 0;
@@ -334,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         trackDistance = 0;
         trackLine = 0;
         markerCount = 0;
-        markerUsed=false;
+        markerUsed = false;
         firstTrackLocationUsed = false;
         mOptionsMenu.findItem(R.id.menu_trackposition).setChecked(false);
         textViewWPCount.setText(Integer.toString(markerCount));
@@ -374,11 +373,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         double distanceToLastPoint = 0;
         try {
             distanceToLastPoint = location.distanceTo(locationPrevious);
-
         } catch (NullPointerException e) {
             Log.d(TAG, "No previous location found");
         }
 
+        //tracks overall line distance
         if (initialLocation == null) {
             initialLocation = location;
         } else {
@@ -386,10 +385,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             textviewTotalLine.setText(String.valueOf(Math.round(sessionTotalLine)));
         }
 
+        //keeps map centered on position
         if (mOptionsMenu.findItem(R.id.menu_keepmapcentered).isChecked() || locationPrevious == null) {
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(newPoint));
         }
 
+        //tracks polyline
         if (mOptionsMenu.findItem(R.id.menu_trackposition).isChecked()) {
 
             if (!firstTrackLocationUsed) {
@@ -403,18 +404,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             trackDistance = distanceToLastPoint + trackDistance;
             trackDistance = Math.round(trackDistance);
             textviewTrackDistance.setText(String.valueOf(trackDistance));
-
             trackLine = Math.round(location.distanceTo(initialTrackLocation));
             textviewTrackLine.setText(String.valueOf(trackLine));
         } else {
             firstTrackLocationUsed = false;
             trackDistance = 0;
         }
+        //tracks overall distance
         totalDistance = distanceToLastPoint + totalDistance;
         totalDistance = Math.round(totalDistance);
         textviewTotalDistance.setText(String.valueOf(totalDistance));
-        accuracy.setText("Täpsus: " + String.valueOf(Math.round(location.getAccuracy())) + " m");
 
+        accuracy.setText("Accuracy: " + String.valueOf(Math.round(location.getAccuracy())) + " m");
+
+        //tracks when marker has been placed
         if (markerUsed) {
             wpDistance = wpDistance + distanceToLastPoint;
             wpDistance = Math.round(wpDistance);
@@ -423,12 +426,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             wpLine = Math.round(wpLine);
             textviewWpLine.setText(String.valueOf(wpLine));
         }
+        //calculates the tempo by using the time that was between latest two locations and converts seconds to min:sec
         double speedSeconds = 1000 / (distanceToLastPoint / 0.5);
         double min = speedSeconds / 60;
         double sec = speedSeconds % 60;
         textViewSpeed.setText(String.format("%s:%s /km", Math.round(min), Math.round(sec)));
         locationPrevious = location;
-        createNotification();
+        mainNotification();
     }
 
     @Override
@@ -465,16 +469,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onPause() {
         super.onPause();
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            Log.d(TAG, "No COARSE location permissions!");
-//        }
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            Log.d(TAG, "No FINE location permissions!");
-//        }
-//
-//        if (locationManager != null) {
-//            locationManager.removeUpdates(this);
-//        }
     }
 
     @Override
@@ -483,12 +477,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onDestroy();
     }
 
-    public void createNotification() {
+    public void mainNotification() {
 
-        // get the view layout
+        // gets the view layout
         RemoteViews remoteView = new RemoteViews(
                 getPackageName(), R.layout.notification);
 
+        // sets current numbers to the notification
         remoteView.setTextViewText(R.id.WP_distance_textView, Math.round(wpDistance) + " m");
         remoteView.setTextViewText(R.id.total_distance_textView, Math.round(totalDistance) + " m");
 
@@ -506,8 +501,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 new Intent("notification-broadcast-resettotal"),
                 0
         );
-        // bring back already running activity
-        // in manifest set android:launchMode="singleTop"
+        // brings back already running activity
         PendingIntent pIntentOpenActivity = PendingIntent.getActivity(
                 this,
                 0,
@@ -515,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
 
-        // attach events
+        // attaches events to elements
         remoteView.setOnClickPendingIntent(R.id.new_marker, pIntentAddWaypoint);
         remoteView.setOnClickPendingIntent(R.id.reset_notif, pIntentResetTotal);
         remoteView.setOnClickPendingIntent(R.id.icon, pIntentOpenActivity);
@@ -527,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         .setSmallIcon(R.drawable.ic_location)
                         .setOngoing(true);
 
-        // notify
+        // notify the manager
         mNotificationManager.notify(0, mBuilder.build());
 
     }
