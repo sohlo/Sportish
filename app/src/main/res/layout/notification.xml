@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:internal="http://schemas.android.com/apk/prv/res/android"
+    android:id="@+id/status_bar_latest_event_content"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:background="#33464b45"
+    android:minHeight="64dp">
+
+    <TextView
+        android:id="@+id/WP_distance_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Distance from waypoint : "
+        android:layout_alignTop="@+id/icon"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/icon"
+        android:layout_marginLeft="5dp" />
+
+    <TextView
+        android:id="@+id/total_distance_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/WP_distance_label"
+        android:layout_marginTop="2dp"
+        android:text="Overall total distance : "
+        android:layout_alignStart="@+id/WP_distance_label" />
+
+    <TextView
+        android:id="@+id/WP_distance_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/total_distance_label"
+        android:layout_toEndOf="@+id/WP_distance_label" />
+
+    <TextView
+        android:id="@+id/total_distance_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/total_distance_label"
+        android:layout_alignBottom="@+id/total_distance_label"
+        android:layout_toEndOf="@+id/total_distance_label" />
+
+    <ImageButton
+        android:id="@+id/new_marker"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_add_marker"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/reset_notif"
+        android:layout_marginEnd="11dp"
+        android:backgroundTint="#00464b45" />
+
+    <ImageButton
+        android:id="@+id/reset_notif"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:onClick="buttonCResetClicked"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_restart_total"
+        android:layout_alignTop="@+id/new_marker"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="16dp"
+        android:backgroundTint="#00464b45" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:src="@mipmap/ic_launcher"
+        android:layout_height="wrap_content"
+        android:id="@+id/icon"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="3dp" />
+</RelativeLayout>
